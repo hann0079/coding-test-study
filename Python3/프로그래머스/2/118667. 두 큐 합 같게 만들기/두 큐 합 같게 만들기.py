@@ -6,7 +6,7 @@ def solution(queue1, queue2):
     sum2 = sum(q2)
     cnt = 0
     
-    for _ in range(3 * len(queue1)):
+    for _ in range(4 * len(queue1)):
         if sum1 > sum2:
             v = q1.popleft()
             sum1 -= v
