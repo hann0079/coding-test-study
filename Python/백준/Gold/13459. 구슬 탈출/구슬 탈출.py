@@ -1,70 +1,60 @@
 from collections import deque
-import sys
 
-input = sys.stdin.readline
-#✅ 입력 형식에 맞춰서 입력값을 받는다.
-n, m = map(int,input().split())
-board = [input().rstrip() for _ in range(n)]
+n, m = map(int, input().split())
+board = [list(input()) for _ in range(n)]
 
-
+dr = [0, 1, 0, -1]
+dc = [1, 0, -1, 0]
 answer = 0
-queue = deque()
+
+for i in range(n):
+    for j in range(m):
+        if board[i][j] == 'R':
+            red = (i, j, 0)
+        elif board[i][j] == 'B':
+            blue = (i, j)
+        elif board[i][j] == 'O':
+            goal = (i, j)
+
 visited = set()
-#✅ 빨간 구슬과 파란 구슬의 위치를 저장한다.
-for r in range(n):
-    for c in range(m):
-        if board[r][c] == "R":
-            rr, rc = r, c
-        elif board[r][c] == "B":
-            br, bc = r, c
-            
-queue.append([rr, rc, br, bc, 1])
-visited.add((rr, rc, br, bc))
+q = deque()
+visited.add((red[0], red[1], blue[0], blue[1]))
+q.append((red[0], red[1], blue[0], blue[1], 1))
 
-def print_init(board, rr, rc, br, bc):
-    board[rr] = board[rr][:rc] + '.' + board[rr][rc+1:]
-    board[br] = board[br][:bc] + '.' + board[br][bc+1:]
-
-def move(r, c, dr, dc):
-    count = 0
-    while board[r+dr][c+dc] != "#" and board[r][c] != "O":
-        r += dr
-        c += dc
-        count += 1
-    return r, c, count
-#✅ 두 구슬의 초기 위치를 시작으로 BFS 알고리즘을 수행한다.
-while queue:
-    cur_rr, cur_rc, cur_br, cur_bc, level = queue.popleft()
-		#✅ 움직임 횟수가 10을 초과하면 반복문을 종료한다.
-    if level > 10:
+while q:
+    cur_r, cur_c, cur_br, cur_bc, cur_count = q.popleft()
+    if cur_count > 10:
         break
-    for dr, dc in [[-1,0],[1,0],[0,-1],[0,1]]:
-				#✅ 기울이는 방향에 따른 두 구슬의 다음 위치를 구한다.
-        next_rr, next_rc, r_count = move(cur_rr, cur_rc, dr, dc)
-        next_br, next_bc, b_count = move(cur_br, cur_bc, dr, dc)
-				#✅ 두 구슬의 다음 위치가 이미 방문했던 위치라면, 다른 방향으로 기울이기를 시도한다.
-        if (next_rr, next_rc, next_br, next_bc) in visited:
+    for i in range(4):
+        next_r, next_c, cnt_r = cur_r, cur_c, 0
+        next_br, next_bc, cnt_b = cur_br, cur_bc, 0
+        while board[next_r + dr[i]][next_c + dc[i]] not in ('#', 'O'):
+            next_r += dr[i]
+            next_c += dc[i]
+            cnt_r += 1
+        while board[next_br + dr[i]][next_bc + dc[i]] not in ('#', 'O'):
+            next_br += dr[i]
+            next_bc += dc[i]
+            cnt_b += 1
+
+        if (next_br + dr[i], next_bc + dc[i]) == goal:
             continue
-				#✅ 파란 구슬의 다음 위치가 구멍이라면, 다른 방향으로 기울이기를 시도한다.
-        if board[next_br][next_bc] == 'O':
-            continue
-				#✅ 빨간 구슬의 다음 위치가 구멍이라면, 반복문을 종료한다.
-        if board[next_rr][next_rc] == 'O':
+        if (next_r + dr[i], next_c + dc[i]) == goal:
             answer = 1
             break
-				#✅ 두 구슬의 다음 위치가 동일할 때, 이동 횟수가 더 많은 구슬의 위치를 한 칸 뒤로 이동한다.
-        if next_rr == next_br and next_rc == next_bc:
-            if r_count > b_count:
-                next_rr -= dr
-                next_rc -= dc
+
+        if next_r == next_br and next_c == next_bc:
+            if cnt_r > cnt_b:
+                next_r -= dr[i]
+                next_c -= dc[i]
             else:
-                next_br -= dr
-                next_bc -= dc
-        queue.append([next_rr, next_rc, next_br, next_bc, level+1])
-				#✅ 두 구슬의 다음 위치를 방문했다고 표시한다.
-        visited.add((next_rr, next_rc, next_br, next_bc))
+                next_br -= dr[i]
+                next_bc -= dc[i]
+
+        if (next_r, next_c, next_br, next_bc) not in visited:
+            q.append((next_r, next_c, next_br, next_bc, cur_count+1))
+            visited.add((next_r, next_c, next_br, next_bc))
     else:
         continue
     break
-#✅ 성공 여부에 따라서 1 또는 0을 출력한다.
 print(answer)
