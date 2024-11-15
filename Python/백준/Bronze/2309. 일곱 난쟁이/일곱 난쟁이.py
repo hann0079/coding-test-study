@@ -1,23 +1,21 @@
-l = list()
-length = 9
-for _ in range(length):
-    l.append(int(input()))
-    l.sort()
+l = [int(input()) for _ in range(9)]
+l.sort()
 
 
 def backtrack(start, ans):
     if len(ans) == 7:
-        return
-    for i in range(start, length):
-        ans.append(l[i])
-        backtrack(i + 1, ans)
         if sum(ans) == 100:
-            result.append(ans[:])
+            return ans
+        return None
+    for i in range(start, 9):
+        ans.append(l[i])
+        result = backtrack(i + 1, ans)
+        if result:
+            return result
         ans.pop()
 
 
-result = []
-backtrack(0, [])
+result = backtrack(0, [])
 
-for item in result[0]:
+for item in result:
     print(item)
