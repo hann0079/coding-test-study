@@ -20,6 +20,3 @@ def solution(progresses, speeds):
         queue.popleft()
 
     return answer
-
-if __name__ == '__main__':
-    print(solution(	[93, 30, 55], [1, 30, 5]))
