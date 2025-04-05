@@ -1,13 +1,21 @@
-n = int(input())
-scores = [int(input()) for _ in range(n)]
+# 입력 받기
+import sys
+input = sys.stdin.read  # 빠른 입력
+data = input().split()
 
-# 1. 점수 정렬
-unique_scores = sorted(set(scores), reverse=True)
+n = int(data[0])
+scores = list(map(int, data[1:]))
 
-# 2. 세 번째 점수 (Bronze)
-bronze_score = unique_scores[2]
+# 점수별 빈도 카운트 (0 ~ 75)
+count = [0] * 76
+for score in scores:
+    count[score] += 1
 
-# 3. bronze 점수를 받은 사람 수 세기
-count = scores.count(bronze_score)
-
-print(bronze_score, count)
+# 높은 점수부터 탐색하며 서로 다른 점수 카운트
+distinct = 0
+for score in range(75, -1, -1):
+    if count[score] > 0:
+        distinct += 1
+        if distinct == 3:
+            print(score, count[score])
+            break
