@@ -1,6 +1,6 @@
 def solution(n):
     answer = 2
-    for i in range(1001):
-        if i**2 == n:
-            answer = 1
+    result = n**(1/2) 
+    if result == int(result):
+        answer = 1
     return answer
