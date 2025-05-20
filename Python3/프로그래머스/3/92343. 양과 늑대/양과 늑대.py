@@ -1,18 +1,9 @@
-from collections import deque
+from collections import deque, defaultdict
 
 def solution(info, edges):
-    tree = {}
-    for e in edges:
-        key = e[0]
-        val = e[1]
-        if key not in tree:
-            tree[key] = [val]
-        else:
-            tree[key].append(val)
-    
-    for i in range(len(info)):
-        if i not in tree:
-            tree[i] = []
+    tree = defaultdict(list)
+    for p, c in edges:
+        tree[p].append(c)
                 
     max_sheep = 0
     q = deque([(0, 1, 0, set())])
