@@ -1,5 +1,7 @@
 def solution(n):
-    answer = n // 7
-    if n % 7:
-        answer += 1
-    return answer
+    p = 1
+    while n // (p * 7) > 1: 
+        p += 1
+    while p * 7 < n:
+        p += 1
+    return p
