@@ -1,33 +1,80 @@
-def solution(n, k, cmd):
-    deleted = []
+class Node:
+    def __init__(self, data, prev=None, next=None):
+        self.data = data
+        self.prev = prev
+        self.next = next
 
-    up = [i - 1 for i in range(n + 2)]
-    down = [i + 1 for i in range(n + 1)]
+class DoubleLinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
 
-    k += 1
-
-    for cmd_i in cmd:
-
-        if cmd_i.startswith("C"):
-            deleted.append(k)
-            up[down[k]] = up[k]
-            down[up[k]] = down[k]
-            k = up[k] if n < down[k] else down[k]
-            
-        elif cmd_i.startswith("Z"):
-            restore = deleted.pop()
-            down[up[restore]] = restore
-            up[down[restore]] = restore
-            
+    def append(self, data):
+        if self.head is None:
+            self.head = Node(data)
+            self.tail = self.head
         else:
-            action, num = cmd_i.split()
-            if action == "U":
-                for _ in range(int(num)):
-                    k = up[k]
+            new_node = Node(data, prev=self.tail)
+            self.tail.next = new_node
+            self.tail = new_node
+
+def solution(n, k, cmd):
+    dll = DoubleLinkedList()
+    nodes = []
+
+    for i in range(n):
+        dll.append(i)
+        if i == 0:
+            nodes.append(dll.head)
+        else:
+            nodes.append(nodes[-1].next)
+
+    cursor = nodes[k]
+    removed = []
+
+    for c in cmd:
+        if c[0] == "U":
+            x = int(c.split()[1])
+            for _ in range(x):
+                cursor = cursor.prev
+
+        elif c[0] == "D":
+            x = int(c.split()[1])
+            for _ in range(x):
+                cursor = cursor.next
+
+        elif c[0] == "C":
+            removed.append(cursor)
+            prev, nxt = cursor.prev, cursor.next
+
+            if prev:
+                prev.next = nxt
             else:
-                for _ in range(int(num)):
-                    k = down[k]
-    answer = ["O"] * n
-    for i in deleted:
-        answer[i - 1] = "X"
-    return "".join(answer)
+                dll.head = nxt
+
+            if nxt:
+                nxt.prev = prev
+            else:
+                dll.tail = prev
+
+            cursor = nxt if nxt else prev
+
+        elif c[0] == "Z":
+            node = removed.pop()
+            prev, nxt = node.prev, node.next
+
+            if prev:
+                prev.next = node
+            else:
+                dll.head = node
+
+            if nxt:
+                nxt.prev = node
+            else:
+                dll.tail = node
+
+    result = ['O'] * n
+    for node in removed:
+        result[node.data] = 'X'
+
+    return ''.join(result)
