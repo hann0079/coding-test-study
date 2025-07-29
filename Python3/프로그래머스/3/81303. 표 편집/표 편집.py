@@ -1,80 +1,40 @@
-class Node:
-    def __init__(self, data, prev=None, next=None):
-        self.data = data
-        self.prev = prev
-        self.next = next
-
-class DoubleLinkedList:
-    def __init__(self):
-        self.head = None
-        self.tail = None
-
-    def append(self, data):
-        if self.head is None:
-            self.head = Node(data)
-            self.tail = self.head
-        else:
-            new_node = Node(data, prev=self.tail)
-            self.tail.next = new_node
-            self.tail = new_node
-
 def solution(n, k, cmd):
-    dll = DoubleLinkedList()
-    nodes = []
+    up = [i - 1 for i in range(n)]
+    down = [i + 1 for i in range(n)]
+    down[n - 1] = -1
 
-    for i in range(n):
-        dll.append(i)
-        if i == 0:
-            nodes.append(dll.head)
-        else:
-            nodes.append(nodes[-1].next)
-
-    cursor = nodes[k]
-    removed = []
+    deleted = []
 
     for c in cmd:
         if c[0] == "U":
             x = int(c.split()[1])
             for _ in range(x):
-                cursor = cursor.prev
+                k = up[k]
 
         elif c[0] == "D":
             x = int(c.split()[1])
             for _ in range(x):
-                cursor = cursor.next
+                k = down[k]
 
         elif c[0] == "C":
-            removed.append(cursor)
-            prev, nxt = cursor.prev, cursor.next
+            deleted.append((k, up[k], down[k]))
 
-            if prev:
-                prev.next = nxt
-            else:
-                dll.head = nxt
+            if up[k] != -1:
+                down[up[k]] = down[k]
+            if down[k] != -1:
+                up[down[k]] = up[k]
 
-            if nxt:
-                nxt.prev = prev
-            else:
-                dll.tail = prev
-
-            cursor = nxt if nxt else prev
+            k = down[k] if down[k] != -1 else up[k]
 
         elif c[0] == "Z":
-            node = removed.pop()
-            prev, nxt = node.prev, node.next
+            cur, prev, next = deleted.pop()
+            if prev != -1:
+                down[prev] = cur
+            if next != -1:
+                up[next] = cur
 
-            if prev:
-                prev.next = node
-            else:
-                dll.head = node
+    answer = ['O'] * n
+    for row, _, _ in deleted:
+        answer[row] = 'X'
 
-            if nxt:
-                nxt.prev = node
-            else:
-                dll.tail = node
-
-    result = ['O'] * n
-    for node in removed:
-        result[node.data] = 'X'
-
-    return ''.join(result)
+    return ''.join(answer)
