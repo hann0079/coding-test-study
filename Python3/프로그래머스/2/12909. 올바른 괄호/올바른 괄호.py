@@ -1,14 +1,11 @@
 def solution(s):
     answer = True
-    stack = []
-    for p in s:
-        if p == "(":
-            stack.append(p)
-        else:
-            if not stack:
-                return False
-            top = stack.pop()
-    if stack:
-        return False
-    return True
-    
+    n = 0
+    for t in s:
+        if t == ')':
+            n -= 1
+        elif t == '(':
+            n += 1
+        if n < 0:
+            return False
+    return answer if not n else False
