@@ -1,40 +1,63 @@
+import sys
 from collections import deque
 
-N = int(input())
-row1 = list(map(int, input().split()))
-row2 = list(map(int, input().split()))
-grid = [row1, row2]
+N = int(sys.stdin.readline())
+grid_row1 = list(map(int, sys.stdin.readline().split()))
+grid_row2 = list(map(int, sys.stdin.readline().split()))
 
-def bfs(g):
-    if g[0][0] == 0 or g[1][N-1] == 0:
-        return False
-    q = deque([(0,0)])
-    visited = [[False]*N for _ in range(2)]
-    visited[0][0] = True
-    while q:
-        x,y = q.popleft()
-        if (x,y) == (1,N-1):
-            return True
-        for dx,dy in [(1,0),(-1,0),(0,1),(0,-1)]:
-            nx,ny = x+dx,y+dy
-            if 0<=nx<2 and 0<=ny<N and not visited[nx][ny] and g[nx][ny]==1:
-                visited[nx][ny] = True
-                q.append((nx,ny))
-    return False
+grid = [grid_row1, grid_row2]
 
-if not bfs(grid):
-    print(0)
-    exit()
-
+ones = []
 for i in range(2):
     for j in range(N):
-        if (i,j) in [(0,0),(1,N-1)]:
-            continue
         if grid[i][j] == 1:
-            grid[i][j] = 0
-            if not bfs(grid):
-                print(1)
-                exit()
-            grid[i][j] = 1
+            ones.append((abs(i - 0) + abs(j - 0), (i, j)))
 
-print(2)
+ones.sort()
+
+def check(k):
+    current_grid = [[grid[i][j] for j in range(N)] for i in range(2)]
+
+    for i in range(1, len(ones)):
+        if i > k:
+            break
+        r, c = ones[i][1]
+        if (r, c) == (0, 0) or (r, c) == (1, N - 1):
+            continue
+        current_grid[r][c] = 0
+
+    q = deque([(0, 0)])
+    visited = [[False] * N for _ in range(2)]
+    visited[0][0] = True
+
+    while q:
+        r, c = q.popleft()
+
+        if (r, c) == (1, N - 1):
+            return False
+
+        dr = [-1, 1, 0, 0]
+        dc = [0, 0, -1, 1]
+
+        for i in range(4):
+            nr, nc = r + dr[i], c + dc[i]
+
+            if 0 <= nr < 2 and 0 <= nc < N and current_grid[nr][nc] == 1 and not visited[nr][nc]:
+                visited[nr][nc] = True
+                q.append((nr, nc))
+
+    return True
+
+low = 0
+high = len(ones) - 2
+ans = high
+
+while low <= high:
+    mid = (low + high) // 2
+    if check(mid):
+        ans = mid
+        high = mid - 1
+    else:
+        low = mid + 1
+
+print(ans)
