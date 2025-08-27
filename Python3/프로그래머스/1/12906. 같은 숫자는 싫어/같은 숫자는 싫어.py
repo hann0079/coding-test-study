@@ -1,5 +1,9 @@
+from collections import deque
 def solution(arr):
-    answer = []
-    # [실행] 버튼을 누르면 출력 값을 볼 수 있습니다.
-    print('Hello Python')
+    q = deque(arr)
+    answer = [q.popleft()]
+    while q:
+        val = q.popleft()
+        if answer[-1] != val:
+            answer.append(val)
     return answer
