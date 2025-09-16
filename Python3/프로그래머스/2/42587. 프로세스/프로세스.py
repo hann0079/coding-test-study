@@ -1,17 +1,16 @@
 from collections import deque
 def solution(priorities, location):
-    answer = []
-    # 큐에 인덱스(프로세스번호), 우선순위 저장
-    queue = deque()
+    answer = 0
+    q = deque()
     for i in range(len(priorities)):
-        queue.append((i, priorities[i]))
-    # 큐에 값이 있는 동안
-    while queue:
-        new = queue.popleft()
-        if any((new[1]<q[1] for q in queue)):
-            queue.append(new)
+        q.append((i , priorities[i]))
+    while q:
+        if q[0][1] >= max(q, key=lambda x:x[1])[1]:
+            m = q.popleft()
+            answer += 1
+            if location == m[0]:
+                return answer
         else:
-            answer.append(new)
-    for i in answer:
-        if i[0] == location:
-            return answer.index(i)+1
+            q.append(q.popleft())
+
+    return answer
