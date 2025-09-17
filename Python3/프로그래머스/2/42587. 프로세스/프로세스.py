@@ -1,9 +1,7 @@
 from collections import deque
 def solution(priorities, location):
     answer = 0
-    q = deque()
-    for i in range(len(priorities)):
-        q.append((i , priorities[i]))
+    q = deque(enumerate(priorities))
     while q:
         if q[0][1] >= max(q, key=lambda x:x[1])[1]:
             m = q.popleft()
